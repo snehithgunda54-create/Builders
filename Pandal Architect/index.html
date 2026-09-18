@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pandal Architect — Festival Blueprint Strategy</title>
+  <meta name="description" content="Design and build grand Ganesha festival pandals under budget, stability, and eco constraints.">
+  
+  <!-- One Google Webfont with system fallback as permitted -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app-container">
+    
+    <!-- Notification Toast -->
+    <div id="hud-notification" class="notification-toast" role="alert" aria-live="polite"></div>
+
+    <!-- 1. HOME SCREEN -->
+    <section id="home-screen" class="screen-container active" aria-labelledby="home-title">
+      <div class="panel-card home-card">
+        <div class="brand-badge">ARCHITECTURAL FESTIVAL STRATEGY</div>
+        <h1 id="home-title" class="brand-title">PANDAL<br><span class="highlight-text">ARCHITECT</span></h1>
+        <p class="brand-subtitle">Craft sacred festival sanctuaries within budget, time, stability, and eco guidelines.</p>
+
+        <!-- Difficulty Segmented Control -->
+        <div class="segmented-control-container">
+          <label class="control-label">Difficulty Tier</label>
+          <div class="segmented-control" role="group" aria-label="Difficulty selection">
+            <button type="button" class="diff-btn" data-diff="EASY">Easy</button>
+            <button type="button" class="diff-btn active" data-diff="MEDIUM">Medium</button>
+            <button type="button" class="diff-btn" data-diff="HARD">Hard</button>
+          </div>
+        </div>
+
+        <div class="menu-button-group">
+          <button id="btn-play" class="btn btn-primary btn-lg pulse-hover">Play Game</button>
+          <button id="btn-level-select" class="btn btn-secondary">Level Select</button>
+          <button id="btn-statistics" class="btn btn-secondary">Statistics</button>
+          <div class="menu-button-row">
+            <button id="btn-settings" class="btn btn-tertiary">Settings</button>
+            <button id="btn-help" class="btn btn-tertiary">Help & Rules</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. LEVEL SELECT SCREEN -->
+    <section id="level-select-screen" class="screen-container hidden" aria-labelledby="level-select-title">
+      <div class="panel-card level-select-card">
+        <div class="screen-header">
+          <h2 id="level-select-title" class="screen-title">Select Sanctuary Level</h2>
+          <button class="btn btn-sm btn-tertiary btn-back-home">Back</button>
+        </div>
+        <div id="level-select-grid" class="level-grid">
+          <!-- Dynamic level cards populated by UIManager -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PLAYING SCREEN (HUD + CANVAS + TOOLBAR) -->
+    <section id="playing-screen" class="screen-container hidden" aria-label="Active Game Arena">
+      <!-- Top HUD -->
+      <header id="hud-bar" class="hud-container">
+        <div class="hud-left">
+          <div class="hud-info-badge">
+            <span id="hud-level-name" class="hud-level-title">Level 1</span>
+            <span id="hud-difficulty-badge" class="hud-difficulty-tag">MEDIUM</span>
+          </div>
+          <div class="hud-resource-pill">
+            <span class="pill-label">Budget</span>
+            <span id="hud-budget" class="pill-value font-mono">₹400</span>
+          </div>
+          <div class="hud-resource-pill">
+            <span class="pill-label">Time</span>
+            <span id="hud-time" class="pill-value font-mono">90s</span>
+          </div>
+        </div>
+
+        <!-- Center Gauges -->
+        <div class="hud-center">
+          <div class="hud-meter-group">
+            <div class="meter-label-row">
+              <span class="meter-name">Stability</span>
+              <span id="hud-stab-val" class="meter-value">0 / 60</span>
+            </div>
+            <div class="meter-track">
+              <div id="hud-stab-bar" class="meter-fill fill-stability" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="hud-meter-group">
+            <div class="meter-label-row">
+              <span class="meter-name">Decoration</span>
+              <span id="hud-dec-val" class="meter-value">0 / 50</span>
+            </div>
+            <div class="meter-track">
+              <div id="hud-dec-bar" class="meter-fill fill-decoration" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="hud-meter-group">
+            <div class="meter-label-row">
+              <span class="meter-name">Eco Rating</span>
+              <span id="hud-eco-val" class="eco-neutral">0</span>
+            </div>
+          </div>
+
+          <div id="hud-crowd-container" class="hud-meter-group hidden">
+            <div class="meter-label-row">
+              <span class="meter-name">Crowd Safety</span>
+              <span id="hud-crowd-val" class="meter-value">0 / 40</span>
+            </div>
+            <div class="meter-track">
+              <div id="hud-crowd-bar" class="meter-fill fill-crowd" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Action Controls -->
+        <div class="hud-right">
+          <button id="btn-finish" class="btn btn-primary btn-sm">Finish Build [F]</button>
+          <button id="btn-pause" class="btn btn-icon" title="Pause Game [Esc]" aria-label="Pause Game">⏸</button>
+          <button id="btn-sound-toggle" class="btn btn-icon" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+        </div>
+      </header>
+
+      <!-- Main Canvas Viewport -->
+      <main id="canvas-container">
+        <canvas id="game-canvas"></canvas>
+      </main>
+
+      <!-- Bottom Item Toolbar -->
+      <footer id="toolbar-container">
+        <div class="toolbar-header">
+          <span class="toolbar-title">Architectural Elements (Hotkeys 1–9)</span>
+          <span class="toolbar-tip">Left-Click: Place | Right-Click / Shift+Click: Remove (50% Refund)</span>
+        </div>
+        <div id="toolbar-items" class="toolbar-scrollable">
+          <!-- Populated dynamically by UIManager -->
+        </div>
+      </footer>
+    </section>
+
+    <!-- 4. PAUSE SCREEN -->
+    <section id="pause-screen" class="screen-container modal-screen hidden" aria-labelledby="pause-title">
+      <div class="panel-card modal-card">
+        <h2 id="pause-title" class="screen-title">Sanctuary Blueprint Paused</h2>
+        <p class="modal-desc">Take a breather. Review your spatial allocation and stability.</p>
+        <div class="menu-button-group">
+          <button id="btn-resume" class="btn btn-primary btn-lg">Resume Building</button>
+          <button id="btn-restart-level" class="btn btn-secondary">Restart Level</button>
+          <button id="btn-pause-level-select" class="btn btn-secondary">Level Select</button>
+          <button id="btn-pause-home" class="btn btn-tertiary">Return Home</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. GAME OVER SCREEN -->
+    <section id="gameover-screen" class="screen-container modal-screen hidden" aria-labelledby="gameover-title">
+      <div class="panel-card modal-card alert-border">
+        <div class="alert-icon">⚠️</div>
+        <h2 id="gameover-title" class="screen-title text-danger">Sanctuary Incomplete</h2>
+        <p id="gameover-reason" class="gameover-detail">Structural Collapse! Stability dropped to 0.</p>
+        
+        <div class="summary-stat-box">
+          <div class="stat-item">
+            <span class="label">Current Level</span>
+            <span id="gameover-level" class="val">Level 1</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Total Attempts</span>
+            <span id="gameover-attempts" class="val">1</span>
+          </div>
+        </div>
+
+        <div class="menu-button-group">
+          <button id="btn-gameover-retry" class="btn btn-primary btn-lg">Retry Level</button>
+          <button id="btn-gameover-level-select" class="btn btn-secondary">Level Select</button>
+          <button id="btn-gameover-home" class="btn btn-tertiary">Return Home</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. LEVEL COMPLETE SCREEN -->
+    <section id="level-complete-screen" class="screen-container modal-screen hidden" aria-labelledby="complete-title">
+      <div class="panel-card modal-card victory-border">
+        <div class="victory-icon">🪔</div>
+        <h2 id="complete-title" class="screen-title text-gold">Level Cleared!</h2>
+        <div id="complete-stars" class="star-rating-lg">★★★</div>
+        
+        <div class="results-grid">
+          <div class="result-row">
+            <span>Final Score:</span>
+            <strong id="complete-score" class="font-mono text-gold">0 pts</strong>
+          </div>
+          <div class="result-row">
+            <span>Eco Bonus:</span>
+            <strong id="complete-eco-bonus" class="font-mono">No bonus</strong>
+          </div>
+          <div class="result-row">
+            <span>Items Removed:</span>
+            <strong id="complete-removals" class="font-mono">0</strong>
+          </div>
+        </div>
+
+        <div class="menu-button-group">
+          <button id="btn-complete-next" class="btn btn-primary btn-lg">Play Next Level</button>
+          <button id="btn-complete-retry" class="btn btn-secondary">Replay for Higher Stars</button>
+          <button id="btn-complete-level-select" class="btn btn-secondary">Level Select</button>
+          <button id="btn-complete-home" class="btn btn-tertiary">Return Home</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. SETTINGS SCREEN -->
+    <section id="settings-screen" class="screen-container hidden" aria-labelledby="settings-title">
+      <div class="panel-card form-card">
+        <div class="screen-header">
+          <h2 id="settings-title" class="screen-title">Preferences & Audio</h2>
+          <button class="btn btn-sm btn-tertiary btn-back-home">Back</button>
+        </div>
+
+        <div class="settings-list">
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="setting-sound">Sound Effects</label>
+              <span class="setting-sub">Procedural placement, removal, and hazard cues</span>
+            </div>
+            <input type="checkbox" id="setting-sound" checked>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="setting-music">Ambient Festive Soundscape</label>
+              <span class="setting-sub">Procedural ambient tone generator</span>
+            </div>
+            <input type="checkbox" id="setting-music" checked>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="setting-volume">Master Volume</label>
+              <span class="setting-sub">Global audio gain</span>
+            </div>
+            <input type="range" id="setting-volume" min="0" max="1" step="0.05" value="0.7">
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="setting-reduced-motion">Reduced Motion</label>
+              <span class="setting-sub">Disable canvas shake and intense particle animations</span>
+            </div>
+            <input type="checkbox" id="setting-reduced-motion">
+          </div>
+
+          <div class="setting-danger-zone">
+            <button id="btn-reset-stats" class="btn btn-danger btn-sm">Reset All Statistics & Records</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. STATISTICS SCREEN -->
+    <section id="statistics-screen" class="screen-container hidden" aria-labelledby="stats-title">
+      <div class="panel-card stats-card">
+        <div class="screen-header">
+          <h2 id="stats-title" class="screen-title">Architectural Records</h2>
+          <button class="btn btn-sm btn-tertiary btn-back-home">Back</button>
+        </div>
+        <div id="stats-content">
+          <!-- Dynamic stats table generated by UIManager -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. HELP & RULES SCREEN -->
+    <section id="help-screen" class="screen-container hidden" aria-labelledby="help-title">
+      <div class="panel-card help-card">
+        <div class="screen-header">
+          <h2 id="help-title" class="screen-title">Blueprint Manual & Rules</h2>
+          <button class="btn btn-sm btn-tertiary btn-back-home">Back</button>
+        </div>
+        <div class="help-content-scrollable">
+          <h3>Core Objectives</h3>
+          <p>As the Lead Pandal Architect, assemble the sacred festival enclosure before time expires while keeping costs under your designated budget.</p>
+          
+          <h3>Essential Parameters</h3>
+          <ul>
+            <li><strong>Stability:</strong> Must reach the level target. If stability drops to 0 or below, the pandal collapses immediately!</li>
+            <li><strong>Decoration:</strong> Reflects visual grandeur and festival spirit.</li>
+            <li><strong>Eco Value:</strong> High eco-friendly materials award a +10% bonus score. Excess plastic banners cause score penalties!</li>
+            <li><strong>Crowd Safety:</strong> In high-traffic stages, install illuminated Exit Signs to protect the crowd.</li>
+          </ul>
+
+          <h3>Environmental Hazards</h3>
+          <ul>
+            <li><strong>Monsoon Rain:</strong> Degrades stability continuously unless protective <em>Canopies</em> are erected.</li>
+            <li><strong>Wind Gusts:</strong> Storm gusts damage stability unless you anchor with at least 4 sturdy pillars.</li>
+            <li><strong>Crowd Surges:</strong> Overcrowding damages decoration unless at least 2 <em>Exit Signs</em> are present.</li>
+          </ul>
+
+          <h3>Controls & Shortcuts</h3>
+          <ul>
+            <li><strong>1–9:</strong> Quick-select item from toolbar</li>
+            <li><strong>Left Click:</strong> Place selected item on grid</li>
+            <li><strong>Right Click / Shift + Click:</strong> Dismantle element (50% cost refund)</li>
+            <li><strong>Space:</strong> Place item on currently hovered cell</li>
+            <li><strong>F:</strong> Submit and finish level</li>
+            <li><strong>Escape:</strong> Pause game</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
